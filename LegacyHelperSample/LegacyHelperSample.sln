@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LegacyHelperSample", "LegacyHelperSample.shproj", "{DBE53987-2A3B-4206-AE11-104C8617CAD6}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LegacyHelper", "..\LegacyHelper.shproj", "{A9C082FE-FA06-4EAC-9CEE-F2B76CB1AEF5}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\LegacyHelper.projitems*{a9c082fe-fa06-4eac-9cee-f2b76cb1aef5}*SharedItemsImports = 13
+		LegacyHelperSample.projitems*{dbe53987-2a3b-4206-ae11-104c8617cad6}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DB51D0C-4B26-4B63-89F3-D518EFD06530}
+	EndGlobalSection
+EndGlobal

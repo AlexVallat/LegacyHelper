@@ -1,0 +1,200 @@
+[
+    {
+        "namespace": "legacy",
+        "functions": [
+            {
+                "name": "loadFrameScript",
+                "type": "function",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "uri",
+                        "type": "string",
+                        "description": "The uri of the script to load"
+                    },
+                    {
+                        "name": "allowDelayedLoad",
+                        "type": "boolean",
+                        "description": "If true, also load into any new frames opened later"
+                    },
+                    {
+                        "name": "runInGlobalScope",
+                        "type": "boolean",
+                        "optional": true,
+                        "default": false,
+                        "description": "Share frame script scope with other frame scripts that have this flag set true"
+                    }
+                ]
+            },
+            {
+                "name": "removeDelayedFrameScript",
+                "type": "function",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "scriptFile",
+                        "type": "string",
+                        "description": "The relative path to the script to unload"
+                    }
+                ]
+            },
+            {
+                "name": "addUnloadMessage",
+                "type": "function",
+                "description": "Adds a message which will be sent to all framescripts when the extension is unloaded",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "messageName",
+                        "type": "string"
+                    },
+                    {
+                        "name": "data",
+                        "type": "boolean",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "broadcastAsyncMessage",
+                "type": "function",
+                "description": "Sends a message to all loaded frame scripts",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "messageName",
+                        "type": "string"
+                    },
+                    {
+                        "name": "data",
+                        "type": "any",
+                        "optional": true,
+                        "description": "An object that can be serialized to JSON, passed as a parameter to the function called."
+                    }
+                ]
+            },
+            {
+                "name": "loadBootstrapScript",
+                "type": "function",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "uri",
+                        "type": "string",
+                        "description": "The uri of the bootstrap script to load. startup(data, reason, messageSender) will be called when the script is loaded, and shutdown(data, reason) when the addon is unloaded or disabled. messageSender can be used to send a message which will be raised as the bootstrapScriptMessage event. Note: install and uninstall methods are not called."
+                    }
+                ]
+            },
+            {
+                "name": "callFunctionInBootstrapScript",
+                "type": "function",
+                "async": true,
+                "parameters": [
+                    {
+                        "name": "uri",
+                        "type": "string",
+                        "description": "The uri of the bootstrap script to load in which to call the function. It must have already been loaded by loadBootstrapScript."
+                    },
+                    {
+                        "name": "functionName",
+                        "type": "string"
+                    },
+                    {
+                        "name": "data",
+                        "type": "any",
+                        "optional": true,
+                        "description": "An object that can be serialized to JSON, passed as a parameter to the function called."
+                    }
+                ]
+            },
+            {
+                "name": "loadStyleSheet",
+                "type": "function",
+                "async": true,
+                "description": "Loads and registers a style sheet. It will be automatically unloaded when the extension is unloaded.",
+                "parameters": [
+                    {
+                        "name": "uri",
+                        "type": "string",
+                        "description": "The uri of the style sheet to load and register."
+                    },
+                    {
+                        "name": "type",
+                        "type": "integer",
+                        "description": "The type of style sheet (AGENT_SHEET, USER_SHEET or AUTHOR_SHEET)"
+
+                    }
+                ]
+            },
+            {
+                "name": "isStyleSheetLoaded",
+                "type": "function",
+                "async": true,
+                "description": "Loads and registers a style sheet",
+                "parameters": [
+                    {
+                        "name": "uri",
+                        "type": "string",
+                        "description": "The uri of the style sheet to load and register."
+                    },
+                    {
+                        "name": "type",
+                        "type": "integer",
+                        "description": "The type of style sheet (AGENT_SHEET, USER_SHEET or AUTHOR_SHEET)"
+
+                    }
+                ]
+            },
+            {
+                "name": "unloadStyleSheet",
+                "type": "function",
+                "async": true,
+                "description": "Unloads and unregisters a style sheet",
+                "parameters": [
+                    {
+                        "name": "uri",
+                        "type": "string",
+                        "description": "The uri of the style sheet to unload."
+                    },
+                    {
+                        "name": "type",
+                        "type": "integer",
+                        "description": "The type of style sheet (AGENT_SHEET, USER_SHEET or AUTHOR_SHEET)"
+
+                    }
+                ]
+            }
+
+        ],
+        "events": [
+            {
+                "name": "onBootstrapScriptMessage",
+                "type": "function",
+                "description": "Event raised when a script loaded with loadBootstrapScript uses the messageSender to send a message",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "type": "any"
+                    }
+                ],
+               "returns": {
+                   "type": "any"
+               } 
+            }
+        ],
+        "properties": {
+            "AGENT_SHEET": {
+                "value": 0,
+                "description": "Used with loadStyleSheet, isStyleSheetLoaded and unloadStyleSheet functions"
+            },
+            "USER_SHEET": {
+                "value": 1,
+                "description": "Used with loadStyleSheet, isStyleSheetLoaded and unloadStyleSheet functions"
+            },
+            "AUTHOR_SHEET": {
+                "value": 2,
+                "description": "Used with loadStyleSheet, isStyleSheetLoaded and unloadStyleSheet functions"
+            }
+        }
+    }
+]

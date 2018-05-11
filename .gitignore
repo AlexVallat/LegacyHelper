@@ -328,3 +328,7 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# Project specific ignores
+*.lnk
+/legacyHelper@experiments.addons.mozilla.org

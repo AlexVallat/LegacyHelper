@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "Legacy Helper Sample",
+    "version": "0.1",
+    "author": "Alex Vallat",
+
+    "applications": {
+        "gecko": {
+            "id": "LegacyHelperSample@byalexv.co.uk",
+            "strict_min_version": "60.0"
+        }
+    },
+
+    "options_ui": {
+        "page": "options.html"
+    },
+
+    "background": {
+        "scripts": [ "loader.js" ]
+    },
+
+    "permissions": [
+        "experiments.legacyHelper"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "addons": {
+        "legacyHelper@experiments.addons.mozilla.org": {
+            "updates": [
+                {
+                    "version": "0.1",
+                    "update_link": "https://github.com/AlexVallat/LegacyHelper/releases/download/v0.1/LegacyHelper.xpi"
+                }
+            ]
+        }
+    }
+}

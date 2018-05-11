@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)bootstrap.js" />
+    <None Include="$(MSBuildThisFileDirectory)framescript.js" />
+    <None Include="$(MSBuildThisFileDirectory)loader.js" />
+    <None Include="$(MSBuildThisFileDirectory)options.js" />
+    <None Include="manifest.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)options.html" />
+    <Content Include="$(MSBuildThisFileDirectory)stylesheet.css" />
+  </ItemGroup>
+</Project>
