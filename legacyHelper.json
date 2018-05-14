@@ -163,7 +163,21 @@
 
                     }
                 ]
+            },
+            {
+                "name": "registerChromeOverride",
+                "type": "function",
+                "async": true,
+                "description": "Registers a folder path (relative to the addon root) as the root of a chrome override. May not contain .. or start with a \\",
+                "parameters": [
+                    {
+                        "name": "path",
+                        "type": "string",
+                        "description": "The path to the chrome folder."
+                    }
+                ]
             }
+
 
         ],
         "events": [

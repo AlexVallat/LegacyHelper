@@ -330,5 +330,5 @@ ASALocalRun/
 .mfractor/
 
 # Project specific ignores
+Build/
 *.lnk
-/legacyHelper@experiments.addons.mozilla.org

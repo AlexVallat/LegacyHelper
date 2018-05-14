@@ -48,6 +48,13 @@ Legacy style sheets are loaded using the  `loadStyleSheet(uri, type)` function. 
 
 Additional helper functions: `isStyleSheetLoaded(uri, type)` and `unloadStyleSheet(uri, type)` are also provided.
 
+### Loading legacy chrome overrides
+Addons used to be able to place files within a chrome folder. This functionality can be reproduced by calling `registerChromeOverride` and passing the path to the chrome folder, relative to the addon root.
+
+```JavaScript
+browser.legacy.registerChromeOverride("chrome", true);
+```
+
 ### Cleaning up on uninstall/disable
 Delayed framescripts are automatically removed, but it is not possible to unload a framescript that has already been loaded into a tab. Accepted practice is to broadcast a message which notifies the framescripts to disable themselves. To assist with this, an `addUnloadMessage(messageName, data)` function is provided. When the addon is unloaded, this message will be broadcast to all framescripts.
 

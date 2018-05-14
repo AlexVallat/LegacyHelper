@@ -8,6 +8,7 @@
     <None Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)chrome\icons\default\main-window.ico" />
     <Content Include="$(MSBuildThisFileDirectory)options.html" />
     <Content Include="$(MSBuildThisFileDirectory)stylesheet.css" />
   </ItemGroup>

@@ -8,7 +8,8 @@ ChromeUtils.import("resource://gre/modules/Services.jsm");
 ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-    ConsoleAPI: "resource://gre/modules/Console.jsm"
+    ConsoleAPI: "resource://gre/modules/Console.jsm",
+    FileUtils: "resource://gre/modules/FileUtils.jsm"
 });
 XPCOMUtils.defineLazyServiceGetter(this, "styleSheetService",
     "@mozilla.org/content/style-sheet-service;1",
@@ -28,6 +29,9 @@ this.legacy = class extends ExtensionAPI {
         const loadedBootstrapSandboxes = {};
         const loadedStyleSheets = [];
 
+        let chromeOverridePaths;
+        let chromeOverrideProvider;
+        
         const messageSender = {
             _listeners: [],
 
@@ -161,11 +165,33 @@ this.legacy = class extends ExtensionAPI {
                     styleSheetService.unregisterSheet(Services.io.newURI(uri, null, null), type);
                 },
 
+                async registerChromeOverride(path) {
+                    if (!chromeOverridePaths) {
+                        chromeOverridePaths = Cc["@mozilla.org/array;1"].createInstance(Ci.nsIMutableArray);
+                        chromeOverrideProvider = {
+                            getFiles: function(prop) {
+                                if (prop === "AChromDL") {
+                                    return chromeOverridePaths.enumerate();
+                                }
+                            },
+                            QueryInterface: XPCOMUtils.generateQI([Ci.nsIDirectoryServiceProvider2])
+                        };
+                        Services.dirsvc.registerProvider(chromeOverrideProvider);
+                    }
+                    const relativeRoot = context.extension.rootURI.file;
+                    relativeRoot.appendRelativePath(path);
+                    console.log(relativeRoot.path);
+                    chromeOverridePaths.appendElement(relativeRoot, false);
+                },
+
                 close: function() {
                     loadedDelayedFrameScripts.forEach(uri => globalMessageManager.removeDelayedFrameScript(uri));
                     unloadMessages.forEach(unloadMessage => globalMessageManager.broadcastAsyncMessage(unloadMessage.name, unloadMessage.data));
                     Object.values(loadedBootstrapSandboxes).forEach(sandbox => sandbox["shutdown"].call(sandbox, context.extension.addonData, context.extension.shutdownReason));
                     loadedStyleSheets.forEach(styleSheet => styleSheetService.unregisterSheet(styleSheet.uri, styleSheet.type));
+                    Services.dirsvc.unregisterProvider(chromeOverrideProvider);
+                    chromeOverrideProvider = null;
+                    chromeOverridePaths = null;
                 }
 	        }
         };
