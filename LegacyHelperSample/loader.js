@@ -1,7 +1,6 @@
 "use strict";
 console.log("LegacyTest loader");
 
-//browser.legacy.registerChromeOverride("C:\\Users\\Family Vallat\\Documents\\Alexander\\Programs\\LegacyHelper\\LegacyHelperSample\\chrome");
 browser.legacy.registerChromeOverride("chrome");
 
 browser.legacy.loadFrameScript(browser.runtime.getURL("framescript.js"), true);

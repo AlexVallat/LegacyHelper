@@ -9,7 +9,8 @@ ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetters(this, {
     ConsoleAPI: "resource://gre/modules/Console.jsm",
-    FileUtils: "resource://gre/modules/FileUtils.jsm"
+    FileUtils: "resource://gre/modules/FileUtils.jsm",
+    ZipUtils: "resource://gre/modules/ZipUtils.jsm"
 });
 XPCOMUtils.defineLazyServiceGetter(this, "styleSheetService",
     "@mozilla.org/content/style-sheet-service;1",
@@ -22,14 +23,32 @@ function remove(array, value) {
     }
 }
 
+function ArrayEnumerator(aItems) {
+    this._index = 0;
+    this._contents = aItems;
+}
+
+ArrayEnumerator.prototype = {
+    _index: 0,
+
+    hasMoreElements() {
+        return this._index < this._contents.length;
+    },
+
+    getNext() {
+        return this._contents[this._index++];
+    }
+};
+
 this.legacy = class extends ExtensionAPI {
     getAPI(context) {
         const loadedDelayedFrameScripts = [];
         const unloadMessages = [];
         const loadedBootstrapSandboxes = {};
         const loadedStyleSheets = [];
+        const chromeOverrideRelativePaths = [];
+        const temporaryFolders = [];
 
-        let chromeOverridePaths;
         let chromeOverrideProvider;
         
         const messageSender = {
@@ -166,32 +185,50 @@ this.legacy = class extends ExtensionAPI {
                 },
 
                 async registerChromeOverride(path) {
-                    if (!chromeOverridePaths) {
-                        chromeOverridePaths = Cc["@mozilla.org/array;1"].createInstance(Ci.nsIMutableArray);
+                    chromeOverrideRelativePaths.push(path);
+
+                    if (!chromeOverrideProvider) {
+                        let rootPath;
+                        if (context.extension.rootURI instanceof Ci.nsIFileURL) {
+                            rootPath = context.extension.rootURI.file;
+                        } else {
+                            // This is a packaged extension, and needs to be unpacked before chrome files can be read
+                            const tempFolder = FileUtils.getFile("TmpD", [context.extension.id]);
+                            tempFolder.createUnique(Components.interfaces.nsIFile.DIRECTORY_TYPE, FileUtils.PERMS_DIRECTORY);
+                            ZipUtils.extractFilesAsync(context.extension.addonData.installPath, tempFolder);
+
+                            temporaryFolders.push(tempFolder); // Store the temp folder for cleanup on shutdown
+
+                            // Use the extracted location as the root path instead
+                            rootPath = tempFolder;
+                        }
+
                         chromeOverrideProvider = {
                             getFiles: function(prop) {
                                 if (prop === "AChromDL") {
-                                    return chromeOverridePaths.enumerate();
+                                    return new ArrayEnumerator(chromeOverrideRelativePaths.map(relativePath => {
+                                        const path = rootPath.clone();
+                                        path.appendRelativePath(relativePath);
+                                        return path;
+                                    }));
                                 }
                             },
                             QueryInterface: XPCOMUtils.generateQI([Ci.nsIDirectoryServiceProvider2])
                         };
                         Services.dirsvc.registerProvider(chromeOverrideProvider);
                     }
-                    const relativeRoot = context.extension.rootURI.file;
-                    relativeRoot.appendRelativePath(path);
-                    console.log(relativeRoot.path);
-                    chromeOverridePaths.appendElement(relativeRoot, false);
                 },
 
-                close: function() {
+                close: function () {
                     loadedDelayedFrameScripts.forEach(uri => globalMessageManager.removeDelayedFrameScript(uri));
                     unloadMessages.forEach(unloadMessage => globalMessageManager.broadcastAsyncMessage(unloadMessage.name, unloadMessage.data));
                     Object.values(loadedBootstrapSandboxes).forEach(sandbox => sandbox["shutdown"].call(sandbox, context.extension.addonData, context.extension.shutdownReason));
                     loadedStyleSheets.forEach(styleSheet => styleSheetService.unregisterSheet(styleSheet.uri, styleSheet.type));
-                    Services.dirsvc.unregisterProvider(chromeOverrideProvider);
-                    chromeOverrideProvider = null;
-                    chromeOverridePaths = null;
+                    temporaryFolders.forEach(tempFolder => tempFolder.remove(true));
+
+                    if (chromeOverrideProvider) {
+                        Services.dirsvc.unregisterProvider(chromeOverrideProvider);
+                    }
                 }
 	        }
         };

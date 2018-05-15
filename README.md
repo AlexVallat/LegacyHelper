@@ -3,7 +3,7 @@ A Firefox WebExtension Experiment addon to provide unrestricted legacy addon fun
 
 By policy and design, WebExtensions are more restricted than the legacy addons they are intended to replace. This means that some of the functionality that legacy addons could provide is no longer possible to do as a WebExtension.
 
-This addon should be regarded as similar to rooting your phone. It is expressely bypassing the restrictions and permissions for WebExtensions for addons that use it. Needless to say, **_if an addon requires you to install this helper, only do so if you trust that addon completely!_**
+This addon should be regarded as similar to jailbreaking or rooting your phone. It is expressely bypassing the restrictions and permissions for WebExtensions for addons that use it. Needless to say, **_if an addon requires you to install this helper, only do so if you trust that addon completely!_**
 
 ## Installation
 This addon can only be installed in [Firefox Developer Edition](https://developer.mozilla.org/en-US/Firefox/Developer_Edition) or [Nightly](https://nightly.mozilla.org/). First, set the `extensions.legacy.enabled` preference in `about:config` to `true`. Then install LegacyHelper.xpi from [Latest Release](https://github.com/AlexVallat/LegacyHelper/releases/latest).
@@ -52,8 +52,10 @@ Additional helper functions: `isStyleSheetLoaded(uri, type)` and `unloadStyleShe
 Addons used to be able to place files within a chrome folder. This functionality can be reproduced by calling `registerChromeOverride` and passing the path to the chrome folder, relative to the addon root.
 
 ```JavaScript
-browser.legacy.registerChromeOverride("chrome", true);
+browser.legacy.registerChromeOverride("chrome");
 ```
+
+Note that if the addon is packed in an .xpi file, it will be automatically extracted into the system temp folder so that the chrome files can be accessed by Firefox. The temporary folder will be automatically deleted when the addon is unloaded, or Firefox is closed.
 
 ### Cleaning up on uninstall/disable
 Delayed framescripts are automatically removed, but it is not possible to unload a framescript that has already been loaded into a tab. Accepted practice is to broadcast a message which notifies the framescripts to disable themselves. To assist with this, an `addUnloadMessage(messageName, data)` function is provided. When the addon is unloaded, this message will be broadcast to all framescripts.
@@ -61,6 +63,8 @@ Delayed framescripts are automatically removed, but it is not possible to unload
 For bootstrap scripts, the `shutdown` function will be called.
 
 Style sheets will be automatcially unloaded.
+
+Chrome overrides will be automatically removed.
 
 ```JavaScript
 //background.js
