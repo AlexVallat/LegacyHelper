@@ -7,10 +7,13 @@ const globalMessageManager = Cc["@mozilla.org/globalmessagemanager;1"].getServic
 ChromeUtils.import("resource://gre/modules/Services.jsm");
 ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 
+//ChromeUtils.import("resource://gre/modules/Timer.jsm");
+
 XPCOMUtils.defineLazyModuleGetters(this, {
     ConsoleAPI: "resource://gre/modules/Console.jsm",
     FileUtils: "resource://gre/modules/FileUtils.jsm",
-    ZipUtils: "resource://gre/modules/ZipUtils.jsm"
+    ZipUtils: "resource://gre/modules/ZipUtils.jsm",
+    SessionStore: "resource:///modules/sessionstore/SessionStore.jsm"
 });
 XPCOMUtils.defineLazyServiceGetter(this, "styleSheetService",
     "@mozilla.org/content/style-sheet-service;1",
@@ -106,7 +109,7 @@ this.legacy = class extends ExtensionAPI {
                             }
                             startupFunction.call(sandbox, context.extension.addonData, reason, messageSender);
                         } catch (e) {
-                            console.log("error calling startup() function: " + e);
+                            console.log("error calling startup() function: ", e);
                             return;
                         }
                     }
@@ -155,7 +158,7 @@ this.legacy = class extends ExtensionAPI {
                             const clonedDetails = Cu.cloneInto(data, existingScriptSandbox);
                             return Promise.resolve(fun.call(existingScriptSandbox, clonedDetails));
                         } catch (e) {
-                            return Promise.reject(new Error("error calling: " + functionName + e));
+                            return Promise.reject(new Error("error calling: " + functionName, e));
                         }
                     } else {
                         return Promise.reject(new Error("bootstrap script not found: " + uri));
@@ -184,7 +187,7 @@ this.legacy = class extends ExtensionAPI {
                     styleSheetService.unregisterSheet(Services.io.newURI(uri, null, null), type);
                 },
 
-                async registerChromeOverride(path) {
+                async registerChromeOverride(path, reloadSession) {
                     chromeOverrideRelativePaths.push(path);
 
                     if (!chromeOverrideProvider) {
@@ -195,7 +198,7 @@ this.legacy = class extends ExtensionAPI {
                             // This is a packaged extension, and needs to be unpacked before chrome files can be read
                             const tempFolder = FileUtils.getFile("TmpD", [context.extension.id]);
                             tempFolder.createUnique(Components.interfaces.nsIFile.DIRECTORY_TYPE, FileUtils.PERMS_DIRECTORY);
-                            ZipUtils.extractFilesAsync(context.extension.addonData.installPath, tempFolder);
+                            ZipUtils.extractFiles(context.extension.addonData.installPath, tempFolder);
 
                             temporaryFolders.push(tempFolder); // Store the temp folder for cleanup on shutdown
 
@@ -216,6 +219,12 @@ this.legacy = class extends ExtensionAPI {
                             QueryInterface: XPCOMUtils.generateQI([Ci.nsIDirectoryServiceProvider2])
                         };
                         Services.dirsvc.registerProvider(chromeOverrideProvider);
+                        if (reloadSession) {
+                            const state = SessionStore.getBrowserState();
+                            Services.wm.getMostRecentWindow("navigator:browser").open("about:blank");
+
+                            SessionStore.setBrowserState(state);
+                        }
                     }
                 },
 
@@ -228,6 +237,7 @@ this.legacy = class extends ExtensionAPI {
 
                     if (chromeOverrideProvider) {
                         Services.dirsvc.unregisterProvider(chromeOverrideProvider);
+                        chromeOverrideProvider = null;
                     }
                 }
 	        }

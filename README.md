@@ -39,7 +39,15 @@ Legacy bootstrap scripts (for the chrome process) are loaded using the `loadBoot
 
 If this function is called again for the same script uri, it won't be re-loaded, but `startup()` will be called again.
 
-The `reason` parameters is passed as a string rather than a constant, for example `"ADDON_INSTALL"` or `"ADDON_DISABLE"`.
+The `reason` parameters is passed as a string rather than a constant. The possible strings are:
+`"APP_STARTUP"`
+`"APP_SHUTDOWN"`
+`"ADDON_ENABLE"`
+`"ADDON_DISABLE"`
+`"ADDON_INSTALL"`
+`"ADDON_UNINSTALL"`
+`"ADDON_UPGRADE"`
+`"ADDON_DOWNGRADE"`
 
 The `messageSender` parameter passed to `startup` can be used to send a message back to the WebExtension by calling `messageSender.sendMessage(message)`. This will be raised by the `onBootstrapScriptMessage` event, so the WebExtension may listen for it using `browser.legacy.onBootstrapScriptMessage.addListener(listener)`. A response to the message may be returned as a `Promise`.
 
@@ -49,13 +57,15 @@ Legacy style sheets are loaded using the  `loadStyleSheet(uri, type)` function. 
 Additional helper functions: `isStyleSheetLoaded(uri, type)` and `unloadStyleSheet(uri, type)` are also provided.
 
 ### Loading legacy chrome overrides
-Addons used to be able to place files within a chrome folder. This functionality can be reproduced by calling `registerChromeOverride` and passing the path to the chrome folder, relative to the addon root.
+Addons used to be able to place files within a chrome folder. This functionality can be reproduced by calling `registerChromeOverride(path, [optional] reloadSession)` and passing the path to the chrome folder, relative to the addon root.
 
 ```JavaScript
-browser.legacy.registerChromeOverride("chrome");
+browser.legacy.registerChromeOverride("chrome", true);
 ```
 
-Note that if the addon is packed in an .xpi file, it will be automatically extracted into the system temp folder so that the chrome files can be accessed by Firefox. The temporary folder will be automatically deleted when the addon is unloaded, or Firefox is closed.
+If the addon is packed in an .xpi file, it will be automatically extracted into the system temp folder so that the chrome files can be accessed by Firefox. The temporary folder will be automatically deleted when the addon is unloaded, or Firefox is closed.
+
+Unfortunately, at the current time, the main window is loaded before addons have a chance to execute, so overrides will not apply to the first open window. To work around this, the open windows can be reloaded (using the session manager) by passing true for the `reloadSession` parameter.
 
 ### Cleaning up on uninstall/disable
 Delayed framescripts are automatically removed, but it is not possible to unload a framescript that has already been loaded into a tab. Accepted practice is to broadcast a message which notifies the framescripts to disable themselves. To assist with this, an `addUnloadMessage(messageName, data)` function is provided. When the addon is unloaded, this message will be broadcast to all framescripts.

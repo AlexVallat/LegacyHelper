@@ -48,48 +48,12 @@
 </head>
 <body>
     <form>
-        <label for="copyHistoryOnNewWindow">Keep history for new windows</label>
-        <input type="checkbox" id="copyHistoryOnNewWindow" value="1" />
+        <label for="testCheckbox">A checkbox</label>
+        <input type="checkbox" id="testCheckbox" value="1" />
         <hr />
 
-        <label for="copyHistoryOnNewTab">Keep history for new tabs</label>
-        <input type="checkbox" id="copyHistoryOnNewTab" value="true"/>
-        <hr />
-
-        <label for="showBranchedHistory">Show branching history</label>
-        <input type="checkbox" id="showBranchedHistory" />
-        <div class="detail">The Back/Forward menu will show all paths followed in branching sub-menus.</div>
-        <hr />
-
-        <label for="menuStructure">Branching history menu style</label>
-        <select id="menuStructure" class="browser-style" disabled="disabled">
-            <option value="0">Normal</option>
-            <option value="1">Branch-centric</option>
-            <option value="2">Smart</option>
-        </select>
-        <div class="detail">When showing branching history, choose how to arrange the branches. Smart will use Branch-centric arrangement only where there are more branches than history for a page.</div>
-
-        <hr/>
-
-        <label for="goBackToOriginalTab">Go back to other tab (&#x21B6;)</label>
-        <input type="checkbox" id="goBackToOriginalTab" />
-        <div class="detail">Going back to a history entry that came from another tab will switch back to that tab to show it. (Merges identical tabs with identical histories)</div>
-        <hr />
-        
-        <label for="parentClickTimeoutWindow">New child window time (ms)</label>
-        <input type="number" id="parentClickTimeoutWindow" disabled="disabled" />
-        <button class="browser-style" id="parentClickTimeoutWindowAuto" type="button" disabled="disabled">Auto-Calibrate</button>
-        <div class="detail">Set this value higher if history is not being copied to new windows because they are slow to open.</div>
-        <hr />
-        
-        <label for="parentClickTimeoutTab">New child tab time (ms)</label>
-        <input type="number" id="parentClickTimeoutTab" disabled="disabled"/>
-        <button class="browser-style" id="parentClickTimeoutTabAuto" type="button" disabled="disabled">Auto-Calibrate</button>
-        <div class="detail">Set this value higher if history is not being copied to new tabs because they are slow to open.</div>
-        <hr />
-        
         <label></label>
-        <button class="browser-style" id="helpButton" type="button">Help</button>
+        <button class="browser-style" id="testButton" type="button"></button>
     </form>
 </body>
 </html>

@@ -1,8 +1,6 @@
 "use strict";
 console.log("LegacyTest loader");
 
-browser.legacy.registerChromeOverride("chrome");
-
 browser.legacy.loadFrameScript(browser.runtime.getURL("framescript.js"), true);
 browser.legacy.addUnloadMessage("LegacyTest@byalexv.co.uk:disable");
 
@@ -27,4 +25,17 @@ setTimeout(function () {
 browser.legacy.onBootstrapScriptMessage.addListener(function (message) {
     console.log("loader received message: ", message);
     return { result: "loader response to message" };
+});
+
+browser.runtime.onMessage.addListener(function webExtensionMessageListener(message, sender) {
+    switch (message.name) {
+        case "GetButtonLabel":
+            return browser.legacy.callFunctionInBootstrapScript(bootstrapScript, "testCallback", "Override Main Window Icon");
+        case "TestButtonClicked":
+            console.log("Test button clicked");
+            browser.legacy.registerChromeOverride("chrome", true);
+            return false;
+        default:
+            throw new Error("Unexpected web extension message: " + message.toString());
+    }
 });
