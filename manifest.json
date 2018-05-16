@@ -13,6 +13,10 @@
         }
     },
 
+    "background": {
+        "scripts": [ "workaround1406055.js" ]
+    },
+
     "experiment_apis": {
         "legacy": {
             "schema": "legacyHelper.json",

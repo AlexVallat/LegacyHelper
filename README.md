@@ -6,7 +6,7 @@ By policy and design, WebExtensions are more restricted than the legacy addons t
 This addon should be regarded as similar to jailbreaking or rooting your phone. It is expressely bypassing the restrictions and permissions for WebExtensions for addons that use it. Needless to say, **_if an addon requires you to install this helper, only do so if you trust that addon completely!_**
 
 ## Installation
-This addon can only be installed in [Firefox Developer Edition](https://developer.mozilla.org/en-US/Firefox/Developer_Edition) or [Nightly](https://nightly.mozilla.org/). First, set the `extensions.legacy.enabled` preference in `about:config` to `true`. Then install LegacyHelper.xpi from [Latest Release](https://github.com/AlexVallat/LegacyHelper/releases/latest).
+This addon can only be installed in [Firefox Developer Edition](https://developer.mozilla.org/en-US/Firefox/Developer_Edition) or [Nightly](https://nightly.mozilla.org/). First, set the `extensions.legacy.enabled` and `xpinstall.signatures.required` preferences in `about:config` to `true` (Mozilla will not sign experiments). Then install LegacyHelper.xpi from [Latest Release](https://github.com/AlexVallat/LegacyHelper/releases/latest).
 
 ## Usage
 Other addons may depend on this addon for their functionality. It does nothing on its own, and only needs to be installed if another addon has requested it.

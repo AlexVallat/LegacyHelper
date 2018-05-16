@@ -76,13 +76,13 @@ this.legacy = class extends ExtensionAPI {
             }
         }
 
-	    const api = {
-	        legacy: {
+        const api = {
+            legacy: {
                 async loadFrameScript(uri, allowDelayedLoad, runInGlobalScope) {
                     globalMessageManager.loadFrameScript(uri, allowDelayedLoad, runInGlobalScope);
-	                if (allowDelayedLoad) {
+                    if (allowDelayedLoad) {
                         loadedDelayedFrameScripts.push(uri);
-	                }
+                    }
                 },
 
                 async removeDelayedFrameScript(uri) {
@@ -90,18 +90,18 @@ this.legacy = class extends ExtensionAPI {
 
                     // Remove from the list of loaded scripts to unload at extension disable
                     remove(loadedDelayedFrameScripts, uri);
-	            },
+                },
 
-	            async addUnloadMessage(messageName, data) {
-	                unloadMessages.push({ name: messageName, data: data });
-	            },
+                async addUnloadMessage(messageName, data) {
+                    unloadMessages.push({ name: messageName, data: data });
+                },
 
-	            async broadcastAsyncMessage(messageName, data) {
-	                globalMessageManager.broadcastAsyncMessage(messageName, data);
+                async broadcastAsyncMessage(messageName, data) {
+                    globalMessageManager.broadcastAsyncMessage(messageName, data);
                 },
 
                 async loadBootstrapScript(uri) {
-                    const runStartup = function(sandbox, reason) {
+                    const runStartup = function (sandbox, reason) {
                         try {
                             const startupFunction = sandbox["startup"];
                             if (!startupFunction) {
@@ -136,9 +136,9 @@ this.legacy = class extends ExtensionAPI {
                     sandbox.__SCRIPT_URI_SPEC__ = uri;
 
                     Services.scriptloader.loadSubScript(uri, sandbox);
-                   
+
                     runStartup(sandbox, context.extension.startupReason);
-                
+
                     let test = sandbox["shutdown"];
                     if (test) {
                         loadedBootstrapSandboxes[uri] = sandbox;
@@ -207,7 +207,7 @@ this.legacy = class extends ExtensionAPI {
                         }
 
                         chromeOverrideProvider = {
-                            getFiles: function(prop) {
+                            getFiles: function (prop) {
                                 if (prop === "AChromDL") {
                                     return new ArrayEnumerator(chromeOverrideRelativePaths.map(relativePath => {
                                         const path = rootPath.clone();
@@ -228,6 +228,21 @@ this.legacy = class extends ExtensionAPI {
                     }
                 },
 
+                // Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1460555
+                async workaround1406055() {
+                    if (context.extension.startupReason === "APP_STARTUP") {
+                        ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
+
+                        AddonManager.getAddonsByTypes(["extension"]).then(addons => {
+                            for (const addon of addons) {
+                                if (addon.isActive && addon.dependencies.includes("legacyHelper@experiments.addons.mozilla.org")) {
+                                    addon.reload();
+                                }
+                            }
+                        });
+                    }
+                },
+
                 close: function () {
                     loadedDelayedFrameScripts.forEach(uri => globalMessageManager.removeDelayedFrameScript(uri));
                     unloadMessages.forEach(unloadMessage => globalMessageManager.broadcastAsyncMessage(unloadMessage.name, unloadMessage.data));
@@ -243,6 +258,6 @@ this.legacy = class extends ExtensionAPI {
 	        }
         };
         context.extension.callOnClose(api.legacy);
-	    return api;
+        return api;
 	}
 }

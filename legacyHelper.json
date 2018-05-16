@@ -183,9 +183,13 @@
                         "description": "If true, all open windows will be reloaded in order to apply the changes."
                     }
                 ]
+            },
+            {
+                "name": "workaround1406055",
+                "type": "function",
+                "async": true,
+                "parameters": []
             }
-
-
         ],
         "events": [
             {
