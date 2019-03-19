@@ -4,8 +4,8 @@ const { utils: Cu , classes: Cc, interfaces: Ci} = Components;
 
 const globalMessageManager = Cc["@mozilla.org/globalmessagemanager;1"].getService();
 
-ChromeUtils.import("resource://gre/modules/Services.jsm");
-ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+const {Services} = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const {XPCOMUtils} = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 //ChromeUtils.import("resource://gre/modules/Timer.jsm");
 
@@ -231,13 +231,20 @@ this.legacy = class extends ExtensionAPI {
                 // Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1460555
                 async workaround1406055() {
                     if (context.extension.startupReason === "APP_STARTUP") {
-                        ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
+                        const {AddonManager} = ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
 
                         AddonManager.getAddonsByTypes(["extension"]).then(addons => {
                             for (const addon of addons) {
-                                if (addon.isActive && addon.dependencies.includes("legacyHelper@experiments.addons.mozilla.org")) {
-                                    addon.reload();
-                                }
+                                if (addon.dependencies.includes("legacyHelper@experiments.addons.mozilla.org")) {
+									if (addon.isActive || addon.isActive === undefined) {
+										console.log("Legacy Helper reloading addon: " + addon.name, addon);
+										addon.reload();
+                                    } else {
+										console.log("Skipping addon: " + addon.name, addon.isActive, addon);
+									}
+								} else {
+									console.log("Skipping non-legacy addon: " + addon.name);
+								}
                             }
                         });
                     }
